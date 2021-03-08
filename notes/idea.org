@@ -1,0 +1,15 @@
+
+* Explore the CSC
+
+What would a "simple" site to explore the CSC 2.0 be like?
+
+For now, this is focused on a simple source search (by name or
+location) rather than more interesting ideas, like most variable or by
+hardness ratio.
+
+- identify location (position and radius)
+- find all master sources (list basic properties)
+ - select a source, so can get basic obsid properties
+   events, psf, exposure map, light curve, spectrum
+
+How do we identify potentially overlapping sources?
