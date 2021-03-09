@@ -3,6 +3,8 @@ Make-up-your-database-as-you-go-along as-a-service
 
 """
 
+import glob
+import os
 import sqlite3
 
 import click
@@ -29,10 +31,27 @@ def close_db(e=None):
 
 
 def init_db():
+    """Not only do we delete the DB but we clean out the
+    instance directory."""
+
+    path = current_app.instance_path
+    print(f"Cleaning up: {path}")
+
+    # Only delete the files in this directory, not any
+    # sub-directories (for now at least).
+    #
+    pat = os.path.join(path, '*')
+    for match in glob.glob(pat):
+        # should we not remove the database?
+        if os.path.isfile(match):
+            os.remove(match)
+
     db = get_db()
 
     with current_app.open_resource('schema.sql') as f:
         db.executescript(f.read().decode('utf8'))
+
+
 
 
 @click.command('init-db')

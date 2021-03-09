@@ -8,6 +8,8 @@ import numpy as np
 from flask import Flask, flash, redirect, render_template, request, url_for
 
 import pycrates
+
+from ciao_contrib.cda import csccli
 from ciao_contrib.runtool import make_tool
 
 from . import dbase
@@ -41,7 +43,9 @@ def create_app():
                 ipath = app.instance_path
                 ctr = search_loc(db, ipath, pos)
                 if ctr is not None:
-                    return redirect(url_for(f'/search/{ctr}'))
+                    # Why can we not create ths URL?
+                    # return redirect(url_for(f'search/{ctr}'))
+                    return redirect(url_for(f'searches'))
 
                 flash(f"No location found for '{pos}'")
 
@@ -96,6 +100,13 @@ def create_app():
 
         return render_template('search.html', search=search[0], table=table, idxs=idxs)
 
+    @app.route('/source/<name>')
+    def source(name):
+        db = dbase.get_db()
+        ipath = app.instance_path
+        base = download_src(db, ipath, name)
+        return f'Something about {name}'
+
     @app.errorhandler(404)
     def not_found(error):
         return render_template('error.html'), 404
@@ -107,9 +118,6 @@ def create_app():
 
 def search_loc(db, path, loc, radius=1):
     """How many sources are near the location?
-
-    We should save the search file somewhere, with a number,
-    so we can recreate the display.
 
     Parameters
     ----------
@@ -141,17 +149,34 @@ def search_loc(db, path, loc, radius=1):
         return None
 
     cr = pycrates.read_file(f"{out}[opt kernel=text/tsv]")
-    names = set(cr.get_column('name').values)
-    nsrc = len(names)
-    cr = None
+    allnames = list(set(cr.get_column('name').values))
+    nsrc = len(allnames)
 
     cur = db.execute(
         'INSERT INTO searches (location, radius, nsrc, filename) VALUES (?, ?, ?, ?)',
-                (loc, radius, nsrc, out)
+        (loc, radius, nsrc, out)
     )
 
     counter = cur.lastrowid
+
+    # Now add the per-source data
+    #
+    for n,r,d,inst,obsid,obi,rid,dstk in zip(cr.get_column('name').values,
+                                             cr.get_column('ra').values,
+                                             cr.get_column('dec').values,
+                                             cr.get_column('instrument').values,
+                                             cr.get_column('obsid').values,
+                                             cr.get_column('obi').values,
+                                             cr.get_column('region_id').values,
+                                             cr.get_column('detect_stack_id').values):
+
+        db.execute(
+            'INSERT INTO sources (src_parent, src_name, src_ra, src_dec, src_instrument, src_obsid, src_obi, src_region_id, src_stack) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
+            (counter, n, float(r), float(d), inst, int(obsid), int(obi), int(rid), dstk)
+        )
+
     db.commit()
+    cr = None
     return counter
 
 
@@ -189,3 +214,57 @@ def read_csc_table(infile, alldata=False):
         cr.delete_column(g)
 
     return cr
+
+
+def download_src(db, path, name):
+    """Download the data files for the source, if needed.
+
+    Parameters
+    ----------
+    dbase
+        The database object.
+    path : str
+        Location for the file.
+    name : str
+        The source name.
+
+    """
+
+    outpath = os.path.join(path, name)
+
+    # Have we already downloaded the data?
+    rsp = db.execute(
+        'SELECT dl_name'
+        ' FROM downloaded'
+        ' WHERE dl_name = ?',
+        (name, )).fetchone()
+    if rsp is not None:
+        return outpath
+
+    srcs = db.execute(
+        'SELECT * FROM sources WHERE src_name = ?',
+        (name, )).fetchall()
+    if srcs is None:
+        return None
+
+    # Marshall into the data we need.
+    #
+    get = []
+    for src in srcs:
+        g = {'name': name,
+             'obsid': str(src['src_obsid']),
+             'obi': str(src['src_obi']),
+             'region_id': str(src['src_region_id']),
+             'instrument': src['src_instrument']}
+        g['tag'] = f"{src['src_obsid']:05d}_{src['src_obi']:03d}"
+        print(g['tag'])
+        get.append(g)
+
+    files = 'regevt,pha,arf,rmf,lc,psf,regexp'
+    bands = 'broad,wide'
+    csccli.retrieve_files(get, path, files, bands, 'all', 'csc2')
+
+    db.execute('INSERT INTO downloaded (dl_name) VALUES (?)',
+               (name, ))
+    db.commit()
+    return outpath

@@ -33,7 +33,11 @@
 	  <tr>
 	    <td>{{ i + 1 }}</td>
 	    {% for col in table.get_colnames() %}
+	    {% if col == 'name' %}
+	    <td><a href="/source/{{ table.get_column(col).values[idxs[i]]|e }}">{{ table.get_column(col).values[idxs[i]]|e }}</a></td>
+	    {% else %}
 	    <td>{{ table.get_column(col).values[idxs[i]]|e }}</td>
+	    {% endif %}
 	    {% endfor %}
 	  </tr>
 	  {% endfor %}
