@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block header %}
+  <h1>{% block title %}CSC 2.0 searches{% endblock %}</h1>
+{% endblock %}
+
+{% block content %}
+  <article class="searches">
+
+    <table class='csc'>
+      <thead>
+	<tr>
+	  <th>Search</th>
+	  <th>Radius</th>
+	  <th>Number of sources</th>
+	  <th>Date</th>
+	</tr>
+      </thead>
+      <tbody>
+	{% for search in searches %}
+	<tr>
+	  <td><a href="/search/{{ search['counter'] }}">{{ search['location'] }}</a></td>
+	  <td>{{ search['radius'] }}</td>
+	  <td>{{ search['nsrc'] }}</td>
+	  <td>{{ search['created'].strftime('%Y-%m-%d %H:%M:%S') }}</td>
+	</tr>
+	{% endfor %}
+
+    </article>
+{% endblock %}

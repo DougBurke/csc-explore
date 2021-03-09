@@ -1,0 +1,78 @@
+
+nav {
+    align-items: center;
+    background: lightgray;
+    display: flex;
+    padding: 0 0.5rem;
+}
+nav h1 {
+    flex: auto;
+    margin: 0;
+}
+nav h1 a {
+    padding: 0.25rem 0.5rem;
+    text-decoration: none;
+}
+nav ul {
+    display: flex;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+nav ul li a, nav ul li span {
+    display: block;
+    padding: 0.5rem;
+}
+
+div.flash {
+    background: #33cc3399;
+    font-weight: bolder;
+    font-size: larger;
+    margin: 1em;
+    padding: 1em;
+}
+
+
+.content {
+    padding: 0 1rem 1rem;
+}
+.content > header {
+    align-items: flex-end;
+    border-bottom: 1px solid lightgray;
+    display: flex;
+}
+.content > header h1 {
+    flex: auto;
+    margin: 1rem 0 0.25rem 0;
+}
+.content:last-child {
+    margin-bottom: 0;
+}
+.content form {
+    display: flex;
+    flex-direction: column;
+    margin: 1em 0;
+}
+.content label {
+    font-weight: bold;
+    margin-bottom: 0.5em;
+}
+.content input, .content textarea {
+    margin-bottom: 1em;
+}
+.content textarea {
+    min-height: 12em;
+    resize: vertical;
+}
+
+input[type=submit] {
+    align-self: start;
+    min-width: 10em;
+}
+
+table.csc {
+    font-family: monospace;
+}
+table.csc tbody tr:nth-child(odd) {
+    background-color: #ccc9;
+}

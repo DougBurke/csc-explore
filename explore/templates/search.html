@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+
+{% block header %}
+  <h1>{% block title %}CSC 2.0 search{% endblock %}</h1>
+{% endblock %}
+
+{% block content %}
+  <article class="search">
+    <div>
+      <h1>{{ search['location'] }}, r={{ search['radius'] }}</h1>
+      <div class="when">{{ search['created'].strftime('%Y-%m-%d') }}</div>
+      <p>
+	Number of sources: {{ search['nsrc'] }}
+      </p>
+
+      <table class='csc'>
+	<thead>
+	  <tr>
+	    <th>Source</th>
+	    {% for col in table.get_colnames() %}
+	    <th>{{ col|e }}</th>
+	    {% endfor %}
+	  </tr>
+	  <tr>
+	    <th/>
+	    {% for col in table.get_colnames() %}
+	    <th>{{ table.get_column(col).unit|e }}</th>
+	    {% endfor %}
+	  </tr>
+	</thead>
+	<tbody>
+	  {% for i in range(search['nsrc']) %}
+	  <tr>
+	    <td>{{ i + 1 }}</td>
+	    {% for col in table.get_colnames() %}
+	    <td>{{ table.get_column(col).values[idxs[i]]|e }}</td>
+	    {% endfor %}
+	  </tr>
+	  {% endfor %}
+
+	</tbody>
+      </table>
+
+    </div>
+  </article>
+{% endblock %}
