@@ -46,6 +46,17 @@ def init_db():
         if os.path.isfile(match):
             os.remove(match)
 
+    # Create the static area. Should probably clean it out
+    # if it already exists.
+    #
+    static = os.path.join(path, 'static')
+    if os.path.isdir(static):
+        # laxy way to delete the directory
+        # os.rmdir(static)
+        os.system(f"rm -rf {static}")
+
+    os.mkdir(static)
+
     db = get_db()
 
     with current_app.open_resource('schema.sql') as f:

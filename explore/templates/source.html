@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+
+{% block header %}
+  <h1>{% block title %}CSC 2.0: {{ name }}{% endblock %}</h1>
+{% endblock %}
+
+{% block content %}
+  <article class="source">
+    <div>
+      <h2>Source properties</h2>
+
+      <table class='csc'>
+	<thead>
+	  <tr>
+	    {% for col in srccols %}
+	    <th>{{ col|e }}</th>
+	    {% endfor %}
+	  </tr>
+	</thead>
+	<tbody>
+	  <tr>
+	    {% for col in srcdata %}
+	    <td>{{ col|e }}</td>
+	    {% endfor %}
+	  </tr>
+	</tbody>
+      </table>
+
+      {% for stack in stacks %}
+      <h2>Stack: {{ stack }}</h2>
+
+      <table class='csc'>
+	<thead>
+	  <tr>
+	    {% for col in obicols %}
+	    <th>{{ col|e }}</th>
+	    {% endfor %}
+	  </tr>
+	</thead>
+	<tbody>
+	  {% for i in range(obidata[stack][0]|length) %}
+	  <tr>
+	    <td><a href="/source/{{ name }}/{{ obidata[stack][0][i] }}">View</a></td>
+	    {% for col in obidata[stack][1:] %}
+	    <td>{{ col[i]|e }}</td>
+	    {% endfor %}
+	  </tr>
+	  {% endfor %}
+	</tbody>
+      </table>
+      {% endfor %}
+
+    </div>
+  </article>
+{% endblock %}

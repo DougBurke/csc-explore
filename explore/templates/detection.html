@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block header %}
+  <h1>{% block title %}CSC 2.0: {{ name }}{% endblock %}</h1>
+{% endblock %}
+
+{% block content %}
+
+  <article class="detection">
+    <div>
+      Detection: {{ obi }}
+      <br/>
+      <a href="/source/{{ name }}">Back to source properties</a>
+
+      <h2>Image data</h2>
+      {{ evt3 | safe }}
+      {{ exp3 | safe }}
+      {{ psf3 | safe }}
+
+      <h2>Light Curve</h2>
+      {{ lc3 | safe }}
+
+      <h2>Spectrum</h2>
+      {{ pha3 | safe }}
+
+    </div>
+  </article>
+{% endblock %}
