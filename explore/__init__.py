@@ -43,9 +43,7 @@ def create_app():
                 ipath = app.instance_path
                 ctr = search_loc(db, ipath, pos)
                 if ctr is not None:
-                    # Why can we not create ths URL?
-                    # return redirect(url_for(f'search/{ctr}'))
-                    return redirect(url_for(f'searches'))
+                    return redirect(f'/search/{ctr}')
 
                 flash(f"No location found for '{pos}'")
 
