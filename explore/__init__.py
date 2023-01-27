@@ -575,11 +575,27 @@ def make_svg_pha3(infile, outfile):
 def add_ellipses(cr, color='w', linestyle='-'):
     """Add ellipses from a region crate.
 
+    For now we skip POLYGON rows. This complicates things as we have
+    to convert an array to a scalar for the non-POLYGON rows.
+
     """
 
+    debug = logging.getLogger("sherpa").debug
     thetas = np.linspace(0, np.pi * 2, 50)
 
+    # Note: what we care about is whether each row is a
+    # scalar or an array. The fact it is related to
+    # POLYGONs is mainly usefulas a label here.
+    #
+    has_polygon = len(cr.get_column("x").values.shape) > 1
+    debug(f" -> has_polygon {has_polygon}")
+
+    debug(f"x: {cr.get_column('x').values.shape}")
+    debug(f"y: {cr.get_column('y').values.shape}")
+    debug(f"r: {cr.get_column('r').values.shape}")
+
     for i in range(cr.get_nrows()):
+        debug(f"shape {i}")
         shape = cr.get_column('shape').values[i]
 
         if shape not in ['Ellipse', '!Ellipse']:
@@ -588,6 +604,11 @@ def add_ellipses(cr, color='w', linestyle='-'):
 
         x0 = cr.get_column('x').values[i]
         y0 = cr.get_column('y').values[i]
+
+        if has_polygon:
+            x0 = x0[0]
+            y0 = y0[0]
+
         r = cr.get_column('r').values[i]
         rmaj = r[0]
         rmin = r[1]
@@ -623,11 +644,15 @@ def add_psf_regions(regfile, color='w'):
 def add_stack_regions(regfile, color='w'):
     """Add on the 'stack' region to the image."""
 
+    debug = logging.getLogger("sherpa").debug
+    debug(f"Stack region: {regfile}")
     ds = pycrates.CrateDataset(regfile, mode='r')
 
+    debug("SRCREG")
     src = ds.get_crate('SRCREG')
     add_ellipses(src, color='cyan')
 
+    debug("BKGREG")
     src = ds.get_crate('BKGREG')
     add_ellipses(src, color='cyan', linestyle='--')
 
