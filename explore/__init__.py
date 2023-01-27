@@ -37,7 +37,8 @@ def create_app():
         DATABASE=os.path.join(app.instance_path, 'explore.sqlite'),
     )
 
-    logging.getLogger('sherpa').setLevel(logging.ERROR)
+    # logging.getLogger('sherpa').setLevel(logging.ERROR)
+    logging.getLogger('sherpa').setLevel(logging.DEBUG)
 
     try:
         os.makedirs(app.instance_path)
