@@ -16,7 +16,7 @@ CIAO, but it has only been tested with a `conda` installed version.
 I stringly suggest creating a separate environment, **just in case**:
 
 ```
-% conda create -n=cscexplore -c https://cxc.cfa.harvard.edu/conda/ciao ciao sherpa ciao-contrib
+% conda create -n=cscexplore -c https://cxc.cfa.harvard.edu/conda/ciao -c conda-forge ciao sherpa ciao-contrib
 % conda activate cscexplore
 ```
 
